@@ -1,0 +1,8 @@
+tqdm
+flask
+yt_dlp
+pydub
+SpeechRecognition
+ffmpeg
+ffprobe
+pytube
