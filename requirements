@@ -1,3 +1,4 @@
+gunicorn
 tqdm
 flask
 yt_dlp
