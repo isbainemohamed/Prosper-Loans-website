@@ -1,1 +1,1 @@
-web: gunicorn wsgi:YoutubeTranscriber
+web: gunicorn wsgi:youtubevideotranscriber
