@@ -24,7 +24,7 @@ ydl_opts = {
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
       error_code = ydl.download(url)
 #reading from audio mp3 file
-sound = AudioSegment.from_mp3("./Backend/test__.mp3")
+sound = AudioSegment.from_mp3("Backend/test__.mp3")
 # spliting audio files
 audio_chunks = split_on_silence(sound, min_silence_len=500, silence_thresh=-40 )
 #loop is used to iterate over the output list
