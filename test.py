@@ -1,37 +1,13 @@
+import logging
+import pandas as pd
 import os
-from pathlib import Path
-from pydub import AudioSegment
+import pickle
+import numpy as np
+import pandas as pd
+import joblib
 
-import yt_dlp
-#Importing library and thir function
-from pydub import AudioSegment
-from pydub.silence import split_on_silence
-url="https://www.youtube.com/watch?v=5o9J_6RqsKc"
-ydl_opts = {
-        'format': 'm4a/bestaudio/best',
-        'noplaylist': True,
-        'continue_dl': True,
-        'outtmpl': f'./Backend/test__.mp3',
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-            'preferredquality': '192',
-        }],
-        'geobypass': True,
-        'ffmpeg_location': 'C:\\ffmpeg\\bin'
-    }
 
-with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-      error_code = ydl.download(url)
-#reading from audio mp3 file
-sound = AudioSegment.from_mp3("Backend/test__.mp3")
-# spliting audio files
-audio_chunks = split_on_silence(sound, min_silence_len=500, silence_thresh=-40 )
-#loop is used to iterate over the output list
-for i, chunk in enumerate(audio_chunks):
-   directory = "./Backend"
-   #print("Exporting file", output_file)
-   #chunk.export(output_file, format="wav")
-   #Path(directory).mkdir(parents=True, exist_ok=True)
-   filename = f"{i}.wav"
-   chunk.export(filename, format="wav")
+data_sample = pd.DataFrame({"loan_amnt": pd.Series([0.0], dtype="float32"), "term": pd.Series([0], dtype="int8"), "int_rate": pd.Series([0.0], dtype="float32"), "grade": pd.Series(["example_value"], dtype="object"), "emp_title": pd.Series(["example_value"], dtype="object"), "emp_length": pd.Series([0], dtype="int8"), "home_ownership": pd.Series(["example_value"], dtype="object"), "annual_inc": pd.Series([0.0], dtype="float32"), "verification_status": pd.Series(["example_value"], dtype="object"), "purpose": pd.Series(["example_value"], dtype="object"), "dti": pd.Series([0.0], dtype="float32")})
+model = joblib.load('model.pkl')
+result = model.predict_proba(data_sample)
+print(result)

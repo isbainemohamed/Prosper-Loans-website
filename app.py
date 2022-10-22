@@ -1,20 +1,10 @@
-import os
-
-from flask import Flask, render_template, request, send_file,redirect
-import Transcriptor as tr
-import yt_dlp
+from flask import Flask, jsonify, request, render_template
+import time
+import random
+from predict import predict
+from predict import run
 
 app = Flask(__name__)
-
-app.config['UPLOAD_FOLDER'] = "./"
-def check_url(url):
-    try:
-        ydl_opts = {}
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=False)
-        return True
-    except:
-        return False
 
 
 @app.route('/')
@@ -22,95 +12,49 @@ def hello_world():  # put application's code here
     return render_template('index.html')
 
 
+if __name__ == '__main__':
+    app.run()
 
-@app.route("/process", methods = ["POST","GET"])
+
+@app.route('/send', methods =["GET", "POST"])
+def process():
+    if request.method == "POST":
+       # getting input with name = fname in HTML form
+
+       full_name = request.form.get('full_name')
+       term = int(request.form.get('term'))
+       # print(transcription)
+       grade = request.form.get('grade')
+       int_rate = request.form.get("int_rate")
+       loan_amnt = request.form.get("loan_amnt")
+       emp_title = request.form.get("emp_title")
+       emp_length = int(request.form.get("emp_length"))
+       home_ownership = request.form.get("home_ownership")
+       annual_inc = float(request.form.get("annual_inc"))
+       verification_status = request.form.get("verification_status")
+       purpose = request.form.get("purpose")
+       dti = request.form.get("dti")
+       ## process request
+       time.sleep(5)
+       #prediction=random.choice(["able","enable"])
+       prediction=run(term,grade,int_rate,loan_amnt,emp_title,emp_length,home_ownership,verification_status,annual_inc,purpose,dti)
+       return {"name":full_name,"prediction":prediction}
+
+
+"""@app.route("/send", methods = ["POST","GET"])
 def process():  # put application's code here
-    url=request.form['url']
-    transcription=request.form['transcription']
-    print(transcription)
-    lang=request.form['language']
-    format=request.form["format"]
-    if check_url(url):
-        response_body=tr.run(url,transcription,lang,format)
-    #os.chdir("/")
-        return response_body
-    else:
-        return {"id":"error"}
-
-"""@app.route('/download/<filename>', methods=['GET', 'POST'])
-def download(filename):
-    # Appending app path to upload folder path within app root folder
-    uploads = os.path.join(current_app.root_path, app.config['Backend/Temp'])
-    # Returning file from appended path
-    return send_from_directory(directory=uploads, filename=filename)"""
-
-@app.route('/download',methods=['GET', 'POST'])
-def download():
-    data={}
-    data["video_id"] = request.form['video_id']
-    data["isTrans"] = str(request.form['isTrans'])
-    data["video_name"]=request.form['video_name']
-    data["format"] = request.form['format']
-    if data["isTrans"]=="true":
-        filename=app.root_path+app.config["UPLOAD_FOLDER"]+"Transcription_"+data["video_id"]+".txt"
-        with open(filename) as f:
-            transcription = f.readline()
-        data["transcription"]=transcription
-    return render_template('download.html', data=data)
-
-@app.route("/new",methods=['GET','POST'])
-def new():
-    data = {}
-    data["video_id"] = request.form['video_id']
-    data["isTrans"] = str(request.form['isTrans'])
-    data["video_name"] = request.form['video_name']
-    data["format"] = request.form['format']
-    audio = app.root_path + app.config["UPLOAD_FOLDER"] + data["video_id"] + "." + data["format"]
-    #filename = app.root_path + app.config["UPLOAD_FOLDER"] + data["video_id"] + "." + data["format"]
-    text = ""
-    if data["isTrans"] == "true":
-        text = app.root_path + app.config["UPLOAD_FOLDER"] + "Transcription_" + data["video_id"] + ".txt"
-    try:
-        os.remove(audio)
-        if text != "":
-            os.remove(text)
-        return redirect("/")
-    except:
-        return redirect("/")
-
-@app.route('/ressource/audio', methods=['GET', 'POST'])
-def get_audio():
-    # Appending app path to upload folder path within app root folder
-    uploads = os.path.join(app.config['UPLOAD_FOLDER'])
-    # Returning file from appended path
-    data={}
-    data["video_id"] = request.form['video_id']
-    data["isTrans"] = str(request.form['isTrans'])
-    data["video_name"] = request.form['video_name']
-    data["format"] = request.form['format']
-    attachement = data["video_name"] + "." + data["format"]
-    filename=app.root_path + app.config["UPLOAD_FOLDER"] + data["video_id"] + "." + data["format"]
-    print(uploads)
-    return send_file(filename, as_attachment=True, download_name=attachement)
+    full_name=request.form['full_name']
+    term=int(request.form['term'])
+    #print(transcription)
+    grade=request.form['grade']
+    int_rate=request.form["int_rate"]
+    emp_title = request.form["emp_title"]
+    emp_length = int(request.form["emp_length"])
+    home_ownership = request.form["home_ownership"]
+    annual_inc = float(request.form["annual_inc"])
+    verification_status = request.form["verification_status"]
+    purpose = request.form["purpose"]
+    dti = request.form["dti"]"""
 
 
 
-@app.route('/ressource/text', methods=['GET', 'POST'])
-def get_text():
-    # Appending app path to upload folder path within app root folder
-    uploads = os.path.join(app.config['UPLOAD_FOLDER'])
-    # Returning file from appended path
-    data = {}
-    data["video_id"] = request.form['video_id']
-    data["isTrans"] = str(request.form['isTrans'])
-    data["video_name"] = request.form['video_name']
-    print(uploads)
-    attachement = data["video_name"] + ".txt"
-    filename =app.root_path+app.config["UPLOAD_FOLDER"]+"Transcription_"+data["video_id"]+".txt"
-    print(filename)
-    print(os.getcwd())
-    return send_file(filename, as_attachment=True, download_name6=attachement)
-
-#tr.speech_recognizer()
-
-#C:\Users\ISBAINE MOHAMED\PycharmProjects\Youtube_downloader\Backend\Temp\eOemjrWnSf8.wav
